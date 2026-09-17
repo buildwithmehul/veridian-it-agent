@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "AUD-0001",
+    "created_at": "2026-09-17T20:00:26",
+    "user_message": "My account is locked after 6 password attempts",
+    "decision": "escalate",
+    "intent": "password",
+    "conversation_id": "CONV-5a333693",
+    "response": "Because the account was tried more than 5 times and is locked, IT needs to unlock it manually. No approval is required. I would route this to IT for manual unlock.",
+    "source_policy": [
+      "KB-01"
+    ],
+    "follow_up": [],
+    "ticket_status": "Open \u2014 routed by AI agent"
+  }
+]
