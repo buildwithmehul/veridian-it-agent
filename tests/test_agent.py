@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.agent import answer, process_active_tickets, POLICIES, REQUESTS, TICKETS, AUDIT_LOG, AUDIT_PATH
+from src.agent import answer, clear_created_tickets, create_ticket, process_active_tickets, POLICIES, REQUESTS, TICKETS, AUDIT_LOG, AUDIT_PATH
 
 class AssignmentScenariosTest(unittest.TestCase):
     @classmethod
@@ -73,7 +73,6 @@ class AssignmentScenariosTest(unittest.TestCase):
 
     def test_created_ticket_has_required_fields(self):
         result = answer('My account is locked after 6 password attempts')
-        from src.agent import create_ticket
         ticket = create_ticket('Test Employee', 'test@veridian-corp.example', 'My account is locked after 6 password attempts', result)
         for field in ('id', 'employee', 'issue', 'category', 'priority', 'status', 'source_policy', 'action_taken', 'escalated'):
             self.assertIn(field, ticket)
@@ -83,6 +82,14 @@ class AssignmentScenariosTest(unittest.TestCase):
         TICKETS.remove(ticket)
         with open(ROOT / 'data/tickets.json', 'w', encoding='utf-8') as file:
             json.dump(persisted, file, indent=2)
+
+    def test_clear_created_tickets_preserves_supplied_tickets(self):
+        result = answer('My account is locked after 6 password attempts')
+        create_ticket('Test Employee', 'test@veridian-corp.example', 'test ticket', result)
+        cleared = clear_created_tickets()
+        self.assertEqual(len(cleared), 10)
+        self.assertTrue(all(not ticket['id'].startswith('AI-') for ticket in cleared))
+        self.assertEqual({ticket['id'] for ticket in cleared}, {f'TK-{number}' for number in range(1042, 1052)})
 
 
 if __name__ == '__main__':

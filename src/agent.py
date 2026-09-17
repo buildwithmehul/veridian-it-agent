@@ -174,6 +174,13 @@ def process_active_tickets():
         })
     return processed
 
+def clear_created_tickets():
+    """Remove only tickets created by this prototype, preserving supplied history."""
+    TICKETS[:] = [ticket for ticket in TICKETS if not ticket['id'].startswith('AI-')]
+    with open(ROOT / 'data/tickets.json', 'w', encoding='utf-8') as f:
+        json.dump(TICKETS, f, indent=2)
+    return TICKETS
+
 def create_ticket(employee, email, query, result):
     active=[t for t in TICKETS if t['id'].startswith('AI-')]
     num=1+max([int(t['id'].split('-')[1]) for t in active],default=0)

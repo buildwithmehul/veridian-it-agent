@@ -1,6 +1,6 @@
 import streamlit as st
 from uuid import uuid4
-from src.agent import answer, create_ticket, process_active_tickets, POLICIES, REQUESTS, TICKETS, AUDIT_LOG
+from src.agent import answer, clear_created_tickets, create_ticket, process_active_tickets, POLICIES, REQUESTS, TICKETS, AUDIT_LOG
 
 st.set_page_config(page_title='Veridian IT Service Agent', page_icon='🛠️', layout='wide')
 
@@ -81,6 +81,9 @@ t1,t2,t3,t4=st.tabs(['Request Queue','Ticket Queue','Knowledge Base','Audit Trai
 with t1:
     st.dataframe(REQUESTS, use_container_width=True, hide_index=True)
 with t2:
+    if st.button('Clear Created Tickets', help='Remove AI-created test tickets only; the 10 supplied tickets are preserved.'):
+        TICKETS = clear_created_tickets()
+        st.success('Created test tickets cleared. The supplied ticket history was preserved.')
     st.dataframe(process_active_tickets() + [t for t in TICKETS if '(active)' not in t['status'].lower()], use_container_width=True, hide_index=True)
 with t3:
     st.dataframe([{'ID':p['id'],'Policy':p['title'],'Source text':p['text']} for p in POLICIES], use_container_width=True, hide_index=True)
